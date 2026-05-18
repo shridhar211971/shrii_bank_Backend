@@ -1,5 +1,6 @@
 HELP.md
 target/
+
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**
 !**/src/test/**
@@ -9,12 +10,12 @@ target/
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -31,6 +32,16 @@ target/
 
 # Logs
 *.log
+
+# Env
+.env
+
+# Uploads
+uploads/
+
+# OS Files
+.DS_Store
+Thumbs.db
 
 # Java crash logs
 hs_err_pid*

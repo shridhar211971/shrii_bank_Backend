@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+
+    <style>
+
+        body{
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container{
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2{
+            color: #1556c0;
+        }
+
+        p{
+            color: #333;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .footer{
+            margin-top: 30px;
+            font-size: 13px;
+            color: #777;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>
+        Welcome,
+        <span th:text="${name}">Customer</span>!
+    </h2>
+
+    <p>
+        We are excited to have you onboard at
+        <b>Shrii Bank</b>.
+    </p>
+
+    <p>
+        Start enjoying seamless deposits,
+        withdrawals,
+        transfers,
+        and monthly statements.
+    </p>
+
+    <p>
+        <b>Your financial journey starts here 🚀</b>
+    </p>
+
+    <div class="footer">
+        © 2026 Shrii Bank | Your Trusted Partner
+    </div>
+
+</div>
+
+</body>
+</html>
