@@ -49,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = Account.builder()
                 .accountNumber(accountNumber)
                 .accountType(accountType)
-                .currency(Currency.USD)
+                .currency(Currency.INR)
                 .balance(BigDecimal.ZERO)
                 .status(AccountStatus.ACTIVE)
                 .user(user)

@@ -24,9 +24,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/audit")
 @RequiredArgsConstructor
-@PreAuthorize(
-        "hasAuthority('ADMIN') or hasAuthority('AUDITOR')"
-)
+@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('AUDITOR')")
 public class AuditorController {
 
     private final AuditorService auditorService;
@@ -90,7 +88,7 @@ public class AuditorController {
     // =========================
     // GET TRANSACTIONS
     // =========================
-
+    
     @GetMapping("/transactions/by-account")
     public ResponseEntity<List<TransactionDTO>>
     getTransactionsByAccountNumber(

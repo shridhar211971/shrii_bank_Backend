@@ -28,6 +28,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,8 +114,10 @@ public class TransactionServiceImpl implements TransactionService {
             );
         }
 
+        int pageNumber = Math.max(page - 1, 0);
+
         Pageable pageable = PageRequest.of(
-                page,
+                pageNumber,
                 size,
                 Sort.by("transactionDate").descending()
         );
@@ -204,57 +207,78 @@ public class TransactionServiceImpl implements TransactionService {
     // TRANSFER
     // ==========================
 
-    private void handleTransfer(
-            TransactionRequest request,
-            Transaction transaction
-    ) {
+   private void handleTransfer(
+        TransactionRequest request,
+        Transaction transaction
+) {
 
-        Account sourceAccount = accountRepo
-                .findByAccountNumber(request.getAccountNumber())
-                .orElseThrow(() ->
-                        new NotFoundException("Source account not found"));
+    Account sourceAccount = accountRepo
+            .findByAccountNumber(request.getAccountNumber())
+            .orElseThrow(() ->
+                    new NotFoundException("Source account not found"));
 
-        Account destination = accountRepo
-                .findByAccountNumber(
-                        request.getDestinationAccountNumber()
-                )
-                .orElseThrow(() ->
-                        new NotFoundException("Destination account not found"));
+    Account destination = accountRepo
+            .findByAccountNumber(
+                    request.getDestinationAccountNumber()
+            )
+            .orElseThrow(() ->
+                    new NotFoundException("Destination account not found"));
 
-        if (sourceAccount.getBalance()
-                .compareTo(request.getAmount()) < 0) {
+    if (sourceAccount.getBalance()
+            .compareTo(request.getAmount()) < 0) {
 
-            throw new RuntimeException(
-                    "Insufficient balance in source account"
-            );
-        }
-
-        // deduct from source
-        sourceAccount.setBalance(
-                sourceAccount.getBalance()
-                        .subtract(request.getAmount())
-        );
-
-        accountRepo.save(sourceAccount);
-
-        // add to destination
-        destination.setBalance(
-                destination.getBalance()
-                        .add(request.getAmount())
-        );
-
-        accountRepo.save(destination);
-
-        transaction.setAccount(sourceAccount);
-
-        transaction.setSourceAccount(
-                sourceAccount.getAccountNumber()
-        );
-
-        transaction.setDestinationAccount(
-                destination.getAccountNumber()
+        throw new RuntimeException(
+                "Insufficient balance in source account"
         );
     }
+
+    // deduct sender balance
+    sourceAccount.setBalance(
+            sourceAccount.getBalance()
+                    .subtract(request.getAmount())
+    );
+
+    // add receiver balance
+    destination.setBalance(
+            destination.getBalance()
+                    .add(request.getAmount())
+    );
+
+    accountRepo.save(sourceAccount);
+    accountRepo.save(destination);
+
+    // =========================
+    // Sender transaction
+    // =========================
+
+    transaction.setAccount(sourceAccount);
+
+    transaction.setSourceAccount(
+            sourceAccount.getAccountNumber()
+    );
+
+    transaction.setDestinationAccount(
+            destination.getAccountNumber()
+    );
+
+    // =========================
+    // Receiver transaction
+    // =========================
+
+    Transaction receiverTxn = Transaction.builder()
+            .amount(request.getAmount())
+            .transactionType(TransactionType.DEPOSIT)
+            .description("Amount received from "
+                    + sourceAccount.getAccountNumber())
+            .status(TransactionStatus.SUCCESS)
+            .transactionDate(LocalDateTime.now())
+            .account(destination)
+            .sourceAccount(sourceAccount.getAccountNumber())
+            .destinationAccount(destination.getAccountNumber())
+            .build();
+
+    transactionRepo.save(receiverTxn);
+}
 
     // ==========================
     // SEND NOTIFICATION

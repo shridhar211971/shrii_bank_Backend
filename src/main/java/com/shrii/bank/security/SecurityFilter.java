@@ -52,6 +52,10 @@ public class SecurityFilter {
                         .requestMatchers(
                                 "/api/auth/**"
                         ).permitAll()
+                        
+                        .requestMatchers(
+                                "/uploads/**"
+                        ).permitAll()
 
                         .anyRequest()
                         .authenticated()
