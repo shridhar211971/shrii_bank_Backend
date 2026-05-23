@@ -254,8 +254,10 @@ public class AuthServiceImpl implements AuthService {
         );
 
         templateVariables.put(
-                "resetLink",
-                resetLink + code
+//                "resetLink",
+//                resetLink + code
+        		"code",
+        		code
         );
 
         NotificationDTO notificationDTO =
