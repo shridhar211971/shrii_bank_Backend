@@ -26,4 +26,9 @@ public interface UserService {
     Response<?> uploadProfilePicture(
             MultipartFile file
     );
+
+    // NEW S3 METHOD
+    Response<?> uploadProfilePictureToS3(
+            MultipartFile file
+    );
 }

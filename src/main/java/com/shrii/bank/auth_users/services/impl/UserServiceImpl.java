@@ -5,6 +5,7 @@ import com.shrii.bank.auth_users.dtos.UserDTO;
 import com.shrii.bank.auth_users.entity.User;
 import com.shrii.bank.auth_users.repo.UserRepo;
 import com.shrii.bank.auth_users.services.UserService;
+import com.shrii.bank.aws.S3Service;
 import com.shrii.bank.exceptions.BadRequestException;
 import com.shrii.bank.exceptions.NotFoundException;
 import com.shrii.bank.notification.services.NotificationService;
@@ -46,7 +47,11 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
     
-    private final String uploadDir = "uploads/profile-pictures/";
+    private final S3Service s3Service;
+    
+//    private final String uploadDir = "uploads/profile-pictures/";
+    
+    private final String uploadDir = "../SHRII-BANK-FRONTEND/public/profile-picture/";
 
     @Override
     public User getCurrentLoggedInUser() {
@@ -235,8 +240,10 @@ public class UserServiceImpl implements UserService {
                     filePath
             );
 
-            String fileUrl =
-                    uploadDir + newFileName;
+//            String fileUrl =
+//                    uploadDir + newFileName;
+            
+            String fileUrl = "profile-picture/" + newFileName;
 
             user.setProfilePictureUrl(fileUrl);
 
@@ -248,6 +255,59 @@ public class UserServiceImpl implements UserService {
                             "Profile picture uploaded successfully."
                     )
                     .data(fileUrl)
+                    .build();
+
+        } catch (IOException e) {
+
+            throw new RuntimeException(
+                    e.getMessage()
+            );
+        }
+    }
+    
+    @Override
+    public Response<?> uploadProfilePictureToS3(
+            MultipartFile file
+    ) {
+
+        log.info("Inside uploadProfilePictureToS3()");
+
+        User user = getCurrentLoggedInUser();
+
+        try {
+
+            // DELETE OLD IMAGE FROM S3
+            if (user.getProfilePictureUrl() != null
+                    && !user.getProfilePictureUrl().isEmpty()) {
+
+                s3Service.deleteFile(
+                        user.getProfilePictureUrl()
+                );
+            }
+
+            // UPLOAD NEW IMAGE
+            String s3Url =
+                    s3Service.uploadFile(
+                            file,
+                            "profile-pictures"
+                    );
+
+            log.info(
+                    "profile url is: {}",
+                    s3Url
+            );
+
+            // SAVE URL IN DATABASE
+            user.setProfilePictureUrl(s3Url);
+
+            userRepo.save(user);
+
+            return Response.builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .message(
+                            "Profile picture uploaded successfully."
+                    )
+                    .data(s3Url)
                     .build();
 
         } catch (IOException e) {
