@@ -1,0 +1,15 @@
+services:
+  shrii-bank-backend:
+
+    build:
+      context: .
+
+    container_name: shrii-bank-backend-container
+
+    ports:
+      - "8080:8080"
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
