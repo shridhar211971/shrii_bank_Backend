@@ -32,10 +32,10 @@ import java.util.Map;
 
 @SpringBootApplication
 @EnableAsync
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class ShriiBankBackendApplication {
 
-    private final NotificationService notificationService;
+//    private final NotificationService notificationService;
 
     public static void main(String[] args) {
         SpringApplication.run(ShriiBankBackendApplication.class, args);
